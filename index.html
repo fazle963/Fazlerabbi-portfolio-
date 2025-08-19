@@ -62,9 +62,7 @@
                     <a href="#" onclick="showPage('portfolio')" class="nav-link text-paynes-grey hover:text-paynes-grey-dark transition-colors">Portfolio</a>
                     <a href="#" onclick="showPage('certificates')" class="nav-link text-paynes-grey hover:text-paynes-grey-dark transition-colors">Certificates</a>
                     <a href="#" onclick="showPage('contact')" class="nav-link text-paynes-grey hover:text-paynes-grey-dark transition-colors">Contact</a>
-                    <button onclick="showAdminLogin()" class="text-paynes-grey hover:text-paynes-grey-dark transition-colors">
-                        <i class="fas fa-cog"></i> Admin
-                    </button>
+
                 </div>
                 <div class="md:hidden flex items-center">
                     <button id="mobile-menu-btn" class="text-paynes-grey">
@@ -80,7 +78,7 @@
                 <a href="#" onclick="showPage('portfolio')" class="block px-3 py-2 text-paynes-grey hover:bg-gray-100">Portfolio</a>
                 <a href="#" onclick="showPage('certificates')" class="block px-3 py-2 text-paynes-grey hover:bg-gray-100">Certificates</a>
                 <a href="#" onclick="showPage('contact')" class="block px-3 py-2 text-paynes-grey hover:bg-gray-100">Contact</a>
-                <button onclick="showAdminLogin()" class="block px-3 py-2 text-paynes-grey hover:bg-gray-100 w-full text-left">Admin</button>
+
             </div>
         </div>
     </nav>
@@ -588,11 +586,97 @@ The experience taught me valuable skills in educational marketing, customer rela
         // Admin authentication
         let isAdminLoggedIn = false;
         
-        // Content storage
+        // Content storage with localStorage persistence
         let contentData = {
             aboutMe: "I am an internal student with a passion for entrepreneurship and business development. I aim to build my own successful business in the future, explore import-export opportunities, and gain practical experience in large companies. My goal is to develop skills and grow into a professional entrepreneur.",
             shikhoDetails: "I worked at Shikho company in Bangladesh, focusing on marketing, student engagement, and educational sales. My role involved developing and implementing marketing strategies that successfully promoted educational products and increased student participation rates.\n\nDuring my tenure, I contributed to campaigns that enhanced the company's outreach efforts, utilizing both digital and traditional marketing approaches. I was responsible for student engagement initiatives, creating content that resonated with our target audience and drove meaningful interactions.\n\nMy sales techniques focused on understanding student needs and presenting educational solutions that provided genuine value. I collaborated with cross-functional teams to ensure our marketing messages were aligned with educational outcomes.\n\nThe experience taught me valuable skills in educational marketing, customer relationship management, and the importance of authentic communication in the education sector. I successfully contributed to increasing enrollment numbers and improving student satisfaction rates through targeted campaigns and personalized engagement strategies."
         };
+
+        // Load saved data from localStorage
+        function loadSavedData() {
+            const saved = localStorage.getItem('portfolioData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                
+                // Load content
+                if (data.contentData) {
+                    contentData = { ...contentData, ...data.contentData };
+                    document.getElementById('about-me-text').textContent = contentData.aboutMe;
+                }
+                
+                // Load images
+                if (data.images) {
+                    Object.keys(data.images).forEach(key => {
+                        const element = document.getElementById(key);
+                        if (element && data.images[key]) {
+                            element.innerHTML = data.images[key];
+                        }
+                    });
+                }
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            const images = {};
+            
+            // Save all uploaded images
+            const imageContainers = [
+                'profile-image-container',
+                'personal-website-image',
+                'shikho-company-image', 
+                'watch-x-zone-image',
+                'shikho-cert-image',
+                'semrush-cert-image',
+                'hubspot-cert-image',
+                'hp-life-cert-image',
+                'unicef-cert-image'
+            ];
+            
+            imageContainers.forEach(id => {
+                const element = document.getElementById(id);
+                if (element && element.innerHTML.includes('<img')) {
+                    images[id] = element.innerHTML;
+                }
+            });
+            
+            const dataToSave = {
+                contentData: contentData,
+                images: images,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('portfolioData', JSON.stringify(dataToSave));
+        }
+
+        // Secret admin access - Mobile and Desktop
+        let logoTapCount = 0;
+        let logoTapTimer = null;
+        
+        // Desktop: Ctrl+Shift+A
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                showAdminLogin();
+            }
+        });
+        
+        // Mobile: Tap logo 5 times quickly
+        document.querySelector('.text-2xl.font-bold.text-paynes-grey').addEventListener('click', function(e) {
+            e.preventDefault();
+            logoTapCount++;
+            
+            if (logoTapCount === 1) {
+                logoTapTimer = setTimeout(() => {
+                    logoTapCount = 0;
+                }, 3000); // Reset after 3 seconds
+            }
+            
+            if (logoTapCount === 5) {
+                clearTimeout(logoTapTimer);
+                logoTapCount = 0;
+                showAdminLogin();
+            }
+        });
 
         // Page navigation
         function showPage(pageId) {
@@ -664,9 +748,10 @@ The experience taught me valuable skills in educational marketing, customer rela
                 reader.onload = function(e) {
                     const container = document.getElementById('profile-image-container');
                     container.innerHTML = `<img src="${e.target.result}" alt="Profile" class="w-full h-full object-cover rounded-lg">`;
+                    saveData(); // Save to localStorage
                 };
                 reader.readAsDataURL(file);
-                alert('Profile image uploaded successfully!');
+                alert('Profile image uploaded and saved successfully!');
             } else {
                 alert('Please select an image file.');
             }
@@ -682,9 +767,10 @@ The experience taught me valuable skills in educational marketing, customer rela
                 reader.onload = function(e) {
                     const container = document.getElementById(select.value + '-image');
                     container.innerHTML = `<img src="${e.target.result}" alt="Portfolio" class="w-full h-full object-cover rounded-lg">`;
+                    saveData(); // Save to localStorage
                 };
                 reader.readAsDataURL(file);
-                alert('Portfolio image uploaded successfully!');
+                alert('Portfolio image uploaded and saved successfully!');
             } else {
                 alert('Please select an image file and category.');
             }
@@ -700,9 +786,10 @@ The experience taught me valuable skills in educational marketing, customer rela
                 reader.onload = function(e) {
                     const container = document.getElementById(select.value + '-image');
                     container.innerHTML = `<img src="${e.target.result}" alt="Certificate" class="w-full h-full object-cover rounded-lg">`;
+                    saveData(); // Save to localStorage
                 };
                 reader.readAsDataURL(file);
-                alert('Certificate image uploaded successfully!');
+                alert('Certificate image uploaded and saved successfully!');
             } else {
                 alert('Please select an image file and certificate type.');
             }
@@ -713,12 +800,14 @@ The experience taught me valuable skills in educational marketing, customer rela
             const content = document.getElementById('about-content').value;
             contentData.aboutMe = content;
             document.getElementById('about-me-text').textContent = content;
+            saveData(); // Save to localStorage
             alert('About Me content saved successfully!');
         }
 
         function saveShikhoContent() {
             const content = document.getElementById('shikho-content').value;
             contentData.shikhoDetails = content;
+            saveData(); // Save to localStorage
             alert('Shikho Company content saved successfully!');
         }
 
@@ -784,6 +873,9 @@ The experience taught me valuable skills in educational marketing, customer rela
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            // Load saved data first
+            loadSavedData();
+            
             // Show home page by default and trigger animations
             setTimeout(() => {
                 document.querySelectorAll('#home .fade-in').forEach(el => {
@@ -805,5 +897,5 @@ The experience taught me valuable skills in educational marketing, customer rela
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9719fedd20376dbe',t:'MTc1NTYxMDEyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'971a641a1247dd0d',t:'MTc1NTYxNDI2OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
