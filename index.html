@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD Fazle Rabbi - Professional Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'paynes-grey': '#536878',
+                        'paynes-grey-light': '#6B7C8C',
+                        'paynes-grey-dark': '#3F4E5C'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .admin-panel {
+            display: none;
+        }
+        .admin-panel.active {
+            display: block;
+        }
+        .modal {
+            display: none;
+        }
+        .modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-gray-200 text-gray-800">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-paynes-grey">MD Fazle Rabbi</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" onclick="showPage('home')" class="nav-link text-paynes-grey hover:text-paynes-grey-dark transition-colors">Home</a>
+                    <a href="#" onclick="showPage('portfolio')" class="nav-link text-paynes-grey hover:text-paynes-grey-dark transition-colors">Portfolio</a>
+                    <a href="#" onclick="showPage('certificates')" class="nav-link text-paynes-grey hover:text-paynes-grey-dark transition-colors">Certificates</a>
+                    <a href="#" onclick="showPage('contact')" class="nav-link text-paynes-grey hover:text-paynes-grey-dark transition-colors">Contact</a>
+                    <button onclick="showAdminLogin()" class="text-paynes-grey hover:text-paynes-grey-dark transition-colors">
+                        <i class="fas fa-cog"></i> Admin
+                    </button>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-paynes-grey">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="#" onclick="showPage('home')" class="block px-3 py-2 text-paynes-grey hover:bg-gray-100">Home</a>
+                <a href="#" onclick="showPage('portfolio')" class="block px-3 py-2 text-paynes-grey hover:bg-gray-100">Portfolio</a>
+                <a href="#" onclick="showPage('certificates')" class="block px-3 py-2 text-paynes-grey hover:bg-gray-100">Certificates</a>
+                <a href="#" onclick="showPage('contact')" class="block px-3 py-2 text-paynes-grey hover:bg-gray-100">Contact</a>
+                <button onclick="showAdminLogin()" class="block px-3 py-2 text-paynes-grey hover:bg-gray-100 w-full text-left">Admin</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold text-paynes-grey mb-6">Admin Login</h2>
+            <form id="admin-login-form">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Username</label>
+                    <input type="text" id="admin-username" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-paynes-grey" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                    <input type="password" id="admin-password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-paynes-grey" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" class="bg-paynes-grey text-white px-4 py-2 rounded-lg hover:bg-paynes-grey-dark transition-colors">Login</button>
+                    <button type="button" onclick="closeAdminLogin()" class="border border-paynes-grey text-paynes-grey px-4 py-2 rounded-lg hover:bg-paynes-grey hover:text-white transition-colors">Cancel</button>
+                </div>
+            </form>
+            <div class="mt-4 text-sm text-gray-600">
+                <p><strong>Demo Credentials:</strong></p>
+                <p>Username: fazle</p>
+                <p>Password: admin123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="admin-panel pt-20 pb-16 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-lg p-8 shadow-lg">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-paynes-grey">Admin Dashboard</h2>
+                    <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">Logout</button>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Profile Image Upload -->
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold text-paynes-grey mb-4">Profile Image</h3>
+                        <input type="file" id="profile-image-upload" accept="image/*" class="mb-4">
+                        <button onclick="uploadProfileImage()" class="bg-paynes-grey text-white px-4 py-2 rounded-lg hover:bg-paynes-grey-dark transition-colors">Upload</button>
+                    </div>
+                    
+                    <!-- Portfolio Images -->
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold text-paynes-grey mb-4">Portfolio Images</h3>
+                        <select id="portfolio-select" class="w-full mb-2 p-2 border rounded">
+                            <option value="personal-website">Personal Website</option>
+                            <option value="shikho-company">Shikho Company</option>
+                            <option value="watch-x-zone">Watch X Zone</option>
+                        </select>
+                        <input type="file" id="portfolio-image-upload" accept="image/*" class="mb-4">
+                        <button onclick="uploadPortfolioImage()" class="bg-paynes-grey text-white px-4 py-2 rounded-lg hover:bg-paynes-grey-dark transition-colors">Upload</button>
+                    </div>
+                    
+                    <!-- Certificate Images -->
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold text-paynes-grey mb-4">Certificate Images</h3>
+                        <select id="certificate-select" class="w-full mb-2 p-2 border rounded">
+                            <option value="shikho-cert">Shikho Certificate</option>
+                            <option value="semrush-cert">Semrush Academy</option>
+                            <option value="hubspot-cert">HubSpot Academy</option>
+                            <option value="hp-life-cert">HP Life Certificate</option>
+                            <option value="unicef-cert">UNICEF Volunteer</option>
+                        </select>
+                        <input type="file" id="certificate-image-upload" accept="image/*" class="mb-4">
+                        <button onclick="uploadCertificateImage()" class="bg-paynes-grey text-white px-4 py-2 rounded-lg hover:bg-paynes-grey-dark transition-colors">Upload</button>
+                    </div>
+                </div>
+                
+                <!-- Content Editor -->
+                <div class="mt-8 bg-gray-50 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-paynes-grey mb-4">Edit Content</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Shikho Company Details (200 words)</label>
+                            <textarea id="shikho-content" rows="8" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-paynes-grey" placeholder="Enter detailed description about Shikho Company work...">I worked at Shikho company in Bangladesh, focusing on marketing, student engagement, and educational sales. My role involved developing and implementing marketing strategies that successfully promoted educational products and increased student participation rates.
+
+During my tenure, I contributed to campaigns that enhanced the company's outreach efforts, utilizing both digital and traditional marketing approaches. I was responsible for student engagement initiatives, creating content that resonated with our target audience and drove meaningful interactions.
+
+My sales techniques focused on understanding student needs and presenting educational solutions that provided genuine value. I collaborated with cross-functional teams to ensure our marketing messages were aligned with educational outcomes.
+
+The experience taught me valuable skills in educational marketing, customer relationship management, and the importance of authentic communication in the education sector. I successfully contributed to increasing enrollment numbers and improving student satisfaction rates through targeted campaigns and personalized engagement strategies.</textarea>
+                            <button onclick="saveShikhoContent()" class="mt-2 bg-paynes-grey text-white px-4 py-2 rounded-lg hover:bg-paynes-grey-dark transition-colors">Save</button>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">About Me Section</label>
+                            <textarea id="about-content" rows="8" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-paynes-grey" placeholder="Enter about me description...">I am an internal student with a passion for entrepreneurship and business development. I aim to build my own successful business in the future, explore import-export opportunities, and gain practical experience in large companies. My goal is to develop skills and grow into a professional entrepreneur.</textarea>
+                            <button onclick="saveAboutContent()" class="mt-2 bg-paynes-grey text-white px-4 py-2 rounded-lg hover:bg-paynes-grey-dark transition-colors">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 1: Homepage -->
+    <div id="home" class="page active">
+        <section class="pt-20 pb-16 min-h-screen">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="fade-in">
+                        <h1 class="text-5xl font-bold text-paynes-grey mb-4">MD Fazle Rabbi</h1>
+                        <p class="text-xl text-paynes-grey-light mb-6 italic">Professional Entrepreneur | Business Enthusiast | Digital Marketing & Sales</p>
+                        
+                        <div class="bg-white p-8 rounded-lg shadow-lg mb-8">
+                            <h2 class="text-2xl font-semibold text-paynes-grey mb-4">About Me</h2>
+                            <p id="about-me-text" class="text-gray-700 leading-relaxed mb-6">
+                                "I am an internal student with a passion for entrepreneurship and business development. I aim to build my own successful business in the future, explore import-export opportunities, and gain practical experience in large companies. My goal is to develop skills and grow into a professional entrepreneur."
+                            </p>
+                            
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <div>
+                                    <h3 class="font-semibold text-paynes-grey mb-2">Skills</h3>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>• Marketing</li>
+                                        <li>• Sales</li>
+                                        <li>• Business Management</li>
+                                        <li>• Digital Tools</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-paynes-grey mb-2">Experience</h3>
+                                    <p class="text-sm text-gray-600">Worked in education, marketing, and personal business projects</p>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-paynes-grey mb-2">Goals</h3>
+                                    <p class="text-sm text-gray-600">Establish my own business, gain international exposure, and become a successful entrepreneur</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-4">
+                            <button onclick="showPage('portfolio')" class="bg-paynes-grey text-white px-6 py-3 rounded-lg hover:bg-paynes-grey-dark transition-colors">
+                                View Portfolio
+                            </button>
+                            <button onclick="showPage('contact')" class="border-2 border-paynes-grey text-paynes-grey px-6 py-3 rounded-lg hover:bg-paynes-grey hover:text-white transition-colors">
+                                Get In Touch
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="fade-in">
+                        <div class="bg-paynes-grey-light rounded-lg p-8 text-center">
+                            <div id="profile-image-container" class="w-64 h-64 mx-auto bg-white rounded-lg flex items-center justify-center mb-4 overflow-hidden">
+                                <i class="fas fa-user text-6xl text-paynes-grey"></i>
+                            </div>
+                            <p class="text-white text-sm">Professional Photo</p>
+                            <p class="text-white text-xs mt-2">Upload via Admin Panel</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Page 2: Portfolio -->
+    <div id="portfolio" class="page">
+        <section class="pt-20 pb-16 min-h-screen">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12 fade-in">
+                    <h2 class="text-4xl font-bold text-paynes-grey mb-4">Portfolio</h2>
+                    <p class="text-xl text-gray-600">Showcasing my professional journey and achievements</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Personal Website -->
+                    <div class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow fade-in">
+                        <div id="personal-website-image" class="h-48 bg-paynes-grey-light rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                            <i class="fas fa-globe text-4xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-paynes-grey mb-2">Personal Website</h3>
+                        <p class="text-gray-600 mb-4">This is my personal website project showcasing my skills in web design, content management, and digital presentation.</p>
+                        <div class="flex space-x-2">
+                            <a href="https://fazle963.github.io/Fazlerabbi-/" target="_blank" class="bg-paynes-grey text-white px-4 py-2 rounded text-sm hover:bg-paynes-grey-dark transition-colors">Visit Website</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Shikho Company -->
+                    <div class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow fade-in">
+                        <div id="shikho-company-image" class="h-48 bg-paynes-grey-light rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                            <i class="fas fa-graduation-cap text-4xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-paynes-grey mb-2">Shikho Company (Bangladesh)</h3>
+                        <p class="text-sm text-paynes-grey-light mb-2">Role: Education, Marketing & Sales</p>
+                        <p class="text-gray-600 mb-4">I worked at Shikho company in Bangladesh, focusing on marketing, student engagement, and educational sales. I contributed to campaigns that successfully promoted educational products and increased student participation.</p>
+                        <div class="flex space-x-2">
+                            <button onclick="showShikhoDetails()" class="bg-paynes-grey text-white px-4 py-2 rounded text-sm hover:bg-paynes-grey-dark transition-colors">Read More</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Watch X Zone -->
+                    <div class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow fade-in">
+                        <div id="watch-x-zone-image" class="h-48 bg-paynes-grey-light rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                            <i class="fas fa-store text-4xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-paynes-grey mb-2">Watch X Zone (Facebook Business)</h3>
+                        <p class="text-sm text-paynes-grey-light mb-2">Role: Founder & Entrepreneur</p>
+                        <p class="text-gray-600 mb-4">Founder of 'Watch X Zone,' a Facebook page selling watches and accessories online. Focused on quality products, low cost, and excellent customer service.</p>
+                        <div class="flex space-x-2">
+                            <a href="https://www.facebook.com/profile.php?id=" target="_blank" class="bg-paynes-grey text-white px-4 py-2 rounded text-sm hover:bg-paynes-grey-dark transition-colors">Visit Page</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- References Section -->
+                <div class="mt-16">
+                    <div class="text-center mb-12 fade-in">
+                        <h2 class="text-4xl font-bold text-paynes-grey mb-4">References</h2>
+                        <p class="text-xl text-gray-600">Professional and business references with testimonials</p>
+                    </div>
+                    
+                    <!-- Professional References -->
+                    <div class="mb-12">
+                        <h3 class="text-2xl font-semibold text-paynes-grey mb-6 text-center">Professional References (Shikho Company)</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-lg p-6 shadow-lg fade-in">
+                                <div class="flex items-start space-x-4">
+                                    <div class="bg-paynes-grey p-3 rounded-full">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-paynes-grey">Mr. Rahim Khan</h4>
+                                        <p class="text-sm text-paynes-grey-light mb-2">Supervisor at Shikho Company</p>
+                                        <p class="text-gray-600 italic">"Fazle Rabbi consistently demonstrated professionalism, creativity, and strong dedication in his work. Highly recommended!"</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-6 shadow-lg fade-in">
+                                <div class="flex items-start space-x-4">
+                                    <div class="bg-paynes-grey p-3 rounded-full">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-paynes-grey">Ms. Salma Akter</h4>
+                                        <p class="text-sm text-paynes-grey-light mb-2">Team Lead at Shikho Company</p>
+                                        <p class="text-gray-600 italic">"A reliable and proactive team member who contributed significantly to our marketing campaigns."</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business References -->
+                    <div class="mb-12">
+                        <h3 class="text-2xl font-semibold text-paynes-grey mb-6 text-center">Business References (Watch X Zone)</h3>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="bg-white rounded-lg p-4 shadow-lg fade-in">
+                                <div class="text-center mb-3">
+                                    <div class="bg-paynes-grey p-2 rounded-full inline-block">
+                                        <i class="fas fa-star text-white text-sm"></i>
+                                    </div>
+                                </div>
+                                <h4 class="font-semibold text-paynes-grey text-sm">Mr. Imran Hossain</h4>
+                                <p class="text-xs text-paynes-grey-light mb-2">Customer</p>
+                                <p class="text-gray-600 text-xs italic">"Excellent quality watches at a low price. Very satisfied with the service!"</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 shadow-lg fade-in">
+                                <div class="text-center mb-3">
+                                    <div class="bg-paynes-grey p-2 rounded-full inline-block">
+                                        <i class="fas fa-star text-white text-sm"></i>
+                                    </div>
+                                </div>
+                                <h4 class="font-semibold text-paynes-grey text-sm">Ms. Farzana Rahman</h4>
+                                <p class="text-xs text-paynes-grey-light mb-2">Customer</p>
+                                <p class="text-gray-600 text-xs italic">"Fast delivery and great communication. Highly recommended seller."</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 shadow-lg fade-in">
+                                <div class="text-center mb-3">
+                                    <div class="bg-paynes-grey p-2 rounded-full inline-block">
+                                        <i class="fas fa-star text-white text-sm"></i>
+                                    </div>
+                                </div>
+                                <h4 class="font-semibold text-paynes-grey text-sm">Mr. Tuhin Alam</h4>
+                                <p class="text-xs text-paynes-grey-light mb-2">Customer</p>
+                                <p class="text-gray-600 text-xs italic">"Professional service and genuine products. Will buy again from Watch X Zone."</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 shadow-lg fade-in">
+                                <div class="text-center mb-3">
+                                    <div class="bg-paynes-grey p-2 rounded-full inline-block">
+                                        <i class="fas fa-star text-white text-sm"></i>
+                                    </div>
+                                </div>
+                                <h4 class="font-semibold text-paynes-grey text-sm">Ms. Rina Sultana</h4>
+                                <p class="text-xs text-paynes-grey-light mb-2">Customer</p>
+                                <p class="text-gray-600 text-xs italic">"Affordable and high-quality products. Fazle Rabbi is very reliable."</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Guidance References -->
+                    <div>
+                        <h3 class="text-2xl font-semibold text-paynes-grey mb-6 text-center">Student Guidance References</h3>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <!-- China Students -->
+                            <div class="bg-white rounded-lg p-6 shadow-lg fade-in">
+                                <h4 class="font-semibold text-paynes-grey mb-4 text-center">China Students Guidelines</h4>
+                                <div class="space-y-4">
+                                    <div class="border-l-4 border-paynes-grey pl-4">
+                                        <h5 class="font-semibold text-sm">Anik</h5>
+                                        <p class="text-xs text-gray-600 italic">"Fazle Rabbi's guidance made my student visa process smooth and clear."</p>
+                                    </div>
+                                    <div class="border-l-4 border-paynes-grey pl-4">
+                                        <h5 class="font-semibold text-sm">Nisha</h5>
+                                        <p class="text-xs text-gray-600 italic">"Thanks to Fazle Rabbi, I felt confident and well-prepared for studying in China."</p>
+                                    </div>
+                                    <div class="border-l-4 border-paynes-grey pl-4">
+                                        <h5 class="font-semibold text-sm">Khokon</h5>
+                                        <p class="text-xs text-gray-600 italic">"Excellent advice and continuous support throughout the application process."</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Korea Students -->
+                            <div class="bg-white rounded-lg p-6 shadow-lg fade-in">
+                                <h4 class="font-semibold text-paynes-grey mb-4 text-center">Korea Students Guidelines</h4>
+                                <div class="space-y-4">
+                                    <div class="border-l-4 border-paynes-grey pl-4">
+                                        <h5 class="font-semibold text-sm">Oyshee</h5>
+                                        <p class="text-xs text-gray-600 italic">"Fazle Rabbi provided clear steps and tips that helped me succeed."</p>
+                                    </div>
+                                    <div class="border-l-4 border-paynes-grey pl-4">
+                                        <h5 class="font-semibold text-sm">Sabikun</h5>
+                                        <p class="text-xs text-gray-600 italic">"Professional guidance and timely support. Highly satisfied."</p>
+                                    </div>
+                                    <div class="border-l-4 border-paynes-grey pl-4">
+                                        <h5 class="font-semibold text-sm">Ariful</h5>
+                                        <p class="text-xs text-gray-600 italic">"A trustworthy mentor for all steps of the student visa process."</p>
+                                    </div>
+                                    <div class="border-l-4 border-paynes-grey pl-4">
+                                        <h5 class="font-semibold text-sm">Tonmoy</h5>
+                                        <p class="text-xs text-gray-600 italic">"Fazle Rabbi's instructions were precise and very helpful for my application."</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Page 3: Certificates -->
+    <div id="certificates" class="page">
+        <section class="pt-20 pb-16 min-h-screen">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12 fade-in">
+                    <h2 class="text-4xl font-bold text-paynes-grey mb-4">Certificates</h2>
+                    <p class="text-xl text-gray-600">Professional certifications and achievements</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Shikho Certificate -->
+                    <div class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow fade-in">
+                        <div id="shikho-cert-image" class="h-48 bg-paynes-grey-light rounded-lg mb-4 flex flex-col items-center justify-center overflow-hidden">
+                            <i class="fas fa-certificate text-4xl text-white mb-2"></i>
+                            <p class="text-white text-xs">Certificate Image</p>
+                        </div>
+                        <h3 class="text-lg font-semibold text-paynes-grey mb-2">Shikho Certificate</h3>
+                        <p class="text-gray-600 text-sm">Certificate recognizing my work at Shikho company in marketing and education.</p>
+                    </div>
+                    
+                    <!-- Semrush Academy -->
+                    <div class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow fade-in">
+                        <div id="semrush-cert-image" class="h-48 bg-paynes-grey-light rounded-lg mb-4 flex flex-col items-center justify-center overflow-hidden">
+                            <i class="fas fa-certificate text-4xl text-white mb-2"></i>
+                            <p class="text-white text-xs">Certificate Image</p>
+                        </div>
+                        <h3 class="text-lg font-semibold text-paynes-grey mb-2">Semrush Academy Certificate</h3>
+                        <p class="text-gray-600 text-sm">Certified in marketing and digital skills by Semrush Academy.</p>
+                    </div>
+                    
+                    <!-- HubSpot Academy -->
+                    <div class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow fade-in">
+                        <div id="hubspot-cert-image" class="h-48 bg-paynes-grey-light rounded-lg mb-4 flex flex-col items-center justify-center overflow-hidden">
+                            <i class="fas fa-certificate text-4xl text-white mb-2"></i>
+                            <p class="text-white text-xs">Certificate Image</p>
+                        </div>
+                        <h3 class="text-lg font-semibold text-paynes-grey mb-2">HubSpot Academy Certificate</h3>
+                        <p class="text-gray-600 text-sm">Completed HubSpot certification for business and marketing courses.</p>
+                    </div>
+                    
+                    <!-- HP Life Certificate -->
+                    <div class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow fade-in">
+                        <div id="hp-life-cert-image" class="h-48 bg-paynes-grey-light rounded-lg mb-4 flex flex-col items-center justify-center overflow-hidden">
+                            <i class="fas fa-certificate text-4xl text-white mb-2"></i>
+                            <p class="text-white text-xs">Certificate Image</p>
+                        </div>
+                        <h3 class="text-lg font-semibold text-paynes-grey mb-2">HP Life Certificate</h3>
+                        <p class="text-gray-600 text-sm">Certified in business, marketing, and digital tools by HP Life.</p>
+                    </div>
+                    
+                    <!-- UNICEF Volunteer -->
+                    <div class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow fade-in">
+                        <div id="unicef-cert-image" class="h-48 bg-paynes-grey-light rounded-lg mb-4 flex flex-col items-center justify-center overflow-hidden">
+                            <i class="fas fa-certificate text-4xl text-white mb-2"></i>
+                            <p class="text-white text-xs">Certificate Image</p>
+                        </div>
+                        <h3 class="text-lg font-semibold text-paynes-grey mb-2">UNICEF Volunteer Certificate</h3>
+                        <p class="text-gray-600 text-sm">Acknowledgment for volunteer contributions with UNICEF projects.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Page 4: Contact -->
+    <div id="contact" class="page">
+        <section class="pt-20 pb-16 min-h-screen">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12 fade-in">
+                    <h2 class="text-4xl font-bold text-paynes-grey mb-4">Contact Me</h2>
+                    <p class="text-xl text-gray-600">Let's connect and discuss opportunities</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-12">
+                    <!-- Contact Information -->
+                    <div class="fade-in">
+                        <div class="bg-white rounded-lg p-8 shadow-lg">
+                            <h3 class="text-2xl font-semibold text-paynes-grey mb-6">Get In Touch</h3>
+                            <div class="space-y-6">
+                                <div class="flex items-center space-x-4">
+                                    <div class="bg-paynes-grey p-3 rounded-full">
+                                        <i class="fas fa-envelope text-xl text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-paynes-grey">Email</p>
+                                        <a href="mailto:fazle9520@gmail.com" class="text-gray-600 hover:text-paynes-grey transition-colors">fazle9520@gmail.com</a>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <div class="bg-paynes-grey p-3 rounded-full">
+                                        <i class="fab fa-linkedin text-xl text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-paynes-grey">LinkedIn</p>
+                                        <a href="https://www.linkedin.com/in/fazle-rabbi-527257319" target="_blank" class="text-gray-600 hover:text-paynes-grey transition-colors">Connect with me on LinkedIn</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Form -->
+                    <div class="fade-in">
+                        <div class="bg-white rounded-lg p-8 shadow-lg">
+                            <h3 class="text-2xl font-semibold text-paynes-grey mb-6">Have a question? Send me a message!</h3>
+                            <form id="contact-form" class="space-y-4">
+                                <div>
+                                    <input type="text" id="name" name="name" placeholder="Your Name" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-paynes-grey focus:border-transparent">
+                                </div>
+                                <div>
+                                    <input type="email" id="email" name="email" placeholder="Your Email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-paynes-grey focus:border-transparent">
+                                </div>
+                                <div>
+                                    <textarea id="message" name="message" rows="5" placeholder="Your Message" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-paynes-grey focus:border-transparent resize-none"></textarea>
+                                </div>
+                                <button type="submit" class="w-full bg-paynes-grey text-white px-6 py-3 rounded-lg font-semibold hover:bg-paynes-grey-dark transition-colors">
+                                    Send Message
+                                </button>
+                            </form>
+                            <div id="form-message" class="mt-4 p-4 rounded-lg hidden"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Shikho Details Modal -->
+    <div id="shikho-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-paynes-grey">Shikho Company - Detailed Experience</h2>
+                <button onclick="closeShikhoModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="shikho-modal-content" class="text-gray-700 leading-relaxed">
+                <p>I worked at Shikho company in Bangladesh, focusing on marketing, student engagement, and educational sales. My role involved developing and implementing marketing strategies that successfully promoted educational products and increased student participation rates.</p>
+                
+                <p class="mt-4">During my tenure, I contributed to campaigns that enhanced the company's outreach efforts, utilizing both digital and traditional marketing approaches. I was responsible for student engagement initiatives, creating content that resonated with our target audience and drove meaningful interactions.</p>
+                
+                <p class="mt-4">My sales techniques focused on understanding student needs and presenting educational solutions that provided genuine value. I collaborated with cross-functional teams to ensure our marketing messages were aligned with educational outcomes.</p>
+                
+                <p class="mt-4">The experience taught me valuable skills in educational marketing, customer relationship management, and the importance of authentic communication in the education sector. I successfully contributed to increasing enrollment numbers and improving student satisfaction rates through targeted campaigns and personalized engagement strategies.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-paynes-grey-dark text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2024 MD Fazle Rabbi. All rights reserved.</p>
+            <p class="text-gray-300 text-sm mt-2">Professional Entrepreneur | Business Enthusiast | Digital Marketing & Sales</p>
+        </div>
+    </footer>
+
+    <script>
+        // Admin authentication
+        let isAdminLoggedIn = false;
+        
+        // Content storage
+        let contentData = {
+            aboutMe: "I am an internal student with a passion for entrepreneurship and business development. I aim to build my own successful business in the future, explore import-export opportunities, and gain practical experience in large companies. My goal is to develop skills and grow into a professional entrepreneur.",
+            shikhoDetails: "I worked at Shikho company in Bangladesh, focusing on marketing, student engagement, and educational sales. My role involved developing and implementing marketing strategies that successfully promoted educational products and increased student participation rates.\n\nDuring my tenure, I contributed to campaigns that enhanced the company's outreach efforts, utilizing both digital and traditional marketing approaches. I was responsible for student engagement initiatives, creating content that resonated with our target audience and drove meaningful interactions.\n\nMy sales techniques focused on understanding student needs and presenting educational solutions that provided genuine value. I collaborated with cross-functional teams to ensure our marketing messages were aligned with educational outcomes.\n\nThe experience taught me valuable skills in educational marketing, customer relationship management, and the importance of authentic communication in the education sector. I successfully contributed to increasing enrollment numbers and improving student satisfaction rates through targeted campaigns and personalized engagement strategies."
+        };
+
+        // Page navigation
+        function showPage(pageId) {
+            // Hide all pages and admin panel
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById('admin-panel').classList.remove('active');
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Close mobile menu
+            document.getElementById('mobile-menu').classList.add('hidden');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+            
+            // Trigger fade-in animations for new page
+            setTimeout(() => {
+                const currentPage = document.getElementById(pageId);
+                currentPage.querySelectorAll('.fade-in').forEach(el => {
+                    el.classList.add('visible');
+                });
+            }, 100);
+        }
+
+        // Admin functions
+        function showAdminLogin() {
+            document.getElementById('admin-login-modal').classList.add('active');
+        }
+
+        function closeAdminLogin() {
+            document.getElementById('admin-login-modal').classList.remove('active');
+        }
+
+        function showAdminPanel() {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show admin panel
+            document.getElementById('admin-panel').classList.add('active');
+            
+            // Load current content into editors
+            document.getElementById('about-content').value = contentData.aboutMe;
+            document.getElementById('shikho-content').value = contentData.shikhoDetails;
+            
+            // Close mobile menu
+            document.getElementById('mobile-menu').classList.add('hidden');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            showPage('home');
+        }
+
+        // Image upload functions
+        function uploadProfileImage() {
+            const fileInput = document.getElementById('profile-image-upload');
+            const file = fileInput.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const container = document.getElementById('profile-image-container');
+                    container.innerHTML = `<img src="${e.target.result}" alt="Profile" class="w-full h-full object-cover rounded-lg">`;
+                };
+                reader.readAsDataURL(file);
+                alert('Profile image uploaded successfully!');
+            } else {
+                alert('Please select an image file.');
+            }
+        }
+
+        function uploadPortfolioImage() {
+            const fileInput = document.getElementById('portfolio-image-upload');
+            const select = document.getElementById('portfolio-select');
+            const file = fileInput.files[0];
+            
+            if (file && select.value) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const container = document.getElementById(select.value + '-image');
+                    container.innerHTML = `<img src="${e.target.result}" alt="Portfolio" class="w-full h-full object-cover rounded-lg">`;
+                };
+                reader.readAsDataURL(file);
+                alert('Portfolio image uploaded successfully!');
+            } else {
+                alert('Please select an image file and category.');
+            }
+        }
+
+        function uploadCertificateImage() {
+            const fileInput = document.getElementById('certificate-image-upload');
+            const select = document.getElementById('certificate-select');
+            const file = fileInput.files[0];
+            
+            if (file && select.value) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const container = document.getElementById(select.value + '-image');
+                    container.innerHTML = `<img src="${e.target.result}" alt="Certificate" class="w-full h-full object-cover rounded-lg">`;
+                };
+                reader.readAsDataURL(file);
+                alert('Certificate image uploaded successfully!');
+            } else {
+                alert('Please select an image file and certificate type.');
+            }
+        }
+
+        // Content save functions
+        function saveAboutContent() {
+            const content = document.getElementById('about-content').value;
+            contentData.aboutMe = content;
+            document.getElementById('about-me-text').textContent = content;
+            alert('About Me content saved successfully!');
+        }
+
+        function saveShikhoContent() {
+            const content = document.getElementById('shikho-content').value;
+            contentData.shikhoDetails = content;
+            alert('Shikho Company content saved successfully!');
+        }
+
+        // Modal functions
+        function showShikhoDetails() {
+            const modal = document.getElementById('shikho-modal');
+            const content = document.getElementById('shikho-modal-content');
+            
+            // Convert line breaks to paragraphs
+            const paragraphs = contentData.shikhoDetails.split('\n\n');
+            content.innerHTML = paragraphs.map(p => `<p class="mb-4">${p}</p>`).join('');
+            
+            modal.classList.add('active');
+        }
+
+        function closeShikhoModal() {
+            document.getElementById('shikho-modal').classList.remove('active');
+        }
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Admin login form
+        document.getElementById('admin-login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('admin-username').value;
+            const password = document.getElementById('admin-password').value;
+            
+            // Demo credentials
+            if (username === 'fazle' && password === 'admin123') {
+                isAdminLoggedIn = true;
+                closeAdminLogin();
+                showAdminPanel();
+                alert('Welcome to Admin Panel!');
+            } else {
+                alert('Invalid credentials. Use: fazle / admin123');
+            }
+        });
+
+        // Contact form handling
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formMessage = document.getElementById('form-message');
+            formMessage.className = 'mt-4 p-4 rounded-lg bg-green-100 text-green-800';
+            formMessage.textContent = 'Thank you for your message! This is a demo form. In a real implementation, this would send your message to MD Fazle Rabbi.';
+            formMessage.classList.remove('hidden');
+            
+            // Reset form
+            this.reset();
+            
+            // Hide message after 5 seconds
+            setTimeout(() => {
+                formMessage.classList.add('hidden');
+            }, 5000);
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show home page by default and trigger animations
+            setTimeout(() => {
+                document.querySelectorAll('#home .fade-in').forEach(el => {
+                    el.classList.add('visible');
+                });
+            }, 100);
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            const adminModal = document.getElementById('admin-login-modal');
+            const shikhoModal = document.getElementById('shikho-modal');
+            
+            if (e.target === adminModal) {
+                closeAdminLogin();
+            }
+            if (e.target === shikhoModal) {
+                closeShikhoModal();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9719fedd20376dbe',t:'MTc1NTYxMDEyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
